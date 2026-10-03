@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        AI-Based Healthcare Accessibility and Hospital Recommendation System using GIS
+    </title>
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+    />
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        /* =====================================
+           HEADER
+        ===================================== */
+
+        .header {
+            height: 80px;
+            background: #145b94;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 10px 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+
+        /* =====================================
+           MAIN CONTENT
+        ===================================== */
+
+        .main-container {
+
+            display: flex;
+
+            width: 100%;
+
+            height: calc(100vh - 80px);
+
+            overflow: hidden;
+        }
+
+
+        /* =====================================
+           MAP SECTION
+        ===================================== */
+
+        .map-section {
+
+            width: 75%;
+
+            height: 100%;
+
+            position: relative;
+        }
+
+
+        #map {
+
+            width: 100%;
+
+            height: 100%;
+
+            min-height: 500px;
+
+            background: #d9edf7;
+        }
+
+
+        /* =====================================
+           RIGHT PANEL
+        ===================================== */
+
+        .side-panel {
+
+            width: 25%;
+
+            height: 100%;
+
+            background: #ffffff;
+
+            border-left: 1px solid #cccccc;
+
+            overflow-y: auto;
+        }
+
+
+        .panel-header {
+
+            height: 75px;
+
+            background: #145b94;
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 10px;
+        }
+
+
+        .panel-header h2 {
+
+            margin: 0;
+
+            font-size: 22px;
+
+            line-height: 1.2;
+        }
+
+
+        /* =====================================
+           INSTRUCTION
+        ===================================== */
+
+        #instruction {
+
+            text-align: center;
+
+            padding: 20px 15px;
+
+            color: #555;
+
+            font-size: 17px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================
+           HOSPITAL LIST
+        ===================================== */
+
+        #hospitalList {
+
+            padding: 0 10px 20px 10px;
+        }
+
+
+        .hospital-card {
+
+            background: #f8f9fa;
+
+            border: 1px solid #d0d0d0;
+
+            border-radius: 8px;
+
+            margin-bottom: 10px;
+
+            padding: 12px;
+
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+
+        .hospital-card:hover {
+
+            background: #eef6ff;
+
+            transform: translateY(-1px);
+        }
+
+
+        .hospital-name {
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            color: #222;
+
+            line-height: 1.4;
+        }
+
+
+        .hospital-distance {
+
+            margin-top: 7px;
+
+            color: #444;
+
+            font-size: 15px;
+        }
+
+
+        /* =====================================
+           STATUS
+        ===================================== */
+
+        #status {
+
+            text-align: center;
+
+            padding: 10px;
+
+            font-size: 14px;
+
+            color: #555;
+        }
+
+
+        /* =====================================
+           LEAFLET POPUP
+        ===================================== */
+
+        .leaflet-popup-content {
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @media (max-width: 900px) {
+
+        /* =====================================
+   MEDICAL SPECIALTY
+===================================== */
+
+#specialtySection {
+
+    padding: 0 15px 15px 15px;
+
+}
+
+#specialtySection label {
+
+    display: block;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    color: #333;
+
+    margin-bottom: 7px;
+
+}
+
+#specialtySelect {
+
+    width: 100%;
+
+    padding: 10px;
+
+    border: 1px solid #cccccc;
+
+    border-radius: 6px;
+
+    background: white;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+}
+
+            body {
+                overflow: auto;
+            }
+
+            .header {
+                height: auto;
+
+                min-height: 75px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .main-container {
+
+                flex-direction: column;
+
+                height: auto;
+            }
+
+            .map-section {
+
+                width: 100%;
+
+                height: 65vh;
+            }
+
+            .side-panel {
+
+                width: 100%;
+
+                height: auto;
+
+                max-height: 35vh;
+            }
+
+            #map {
+                min-height: 400px;
+            }
+
+        }
+        .hospital-score {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .hospital-ai-score {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+            font-size: 15px;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================
+     HEADER
+========================================= -->
+
+<div class="header">
+
+    <h1>
+        AI-Based Healthcare Accessibility and Hospital Recommendation System using GIS
+    </h1>
+
+</div>
+
+
+
+<!-- =========================================
+     MAIN CONTAINER
+========================================= -->
+
+<div class="main-container">
+
+
+    <!-- =====================================
+         MAP
+    ====================================== -->
+
+    <div class="map-section">
+
+        <div id="map"></div>
+
+    </div>
+
+
+
+    <!-- =====================================
+         RIGHT PANEL
+    ====================================== -->
+
+    <div class="side-panel">
+
+
+        <div class="panel-header">
+
+            <h2>
+                🏥 Top 5 Recommended Hospitals
+            </h2>
+
+        </div>
+
+
+        <div id="instruction">
+
+    📍 Select medical specialty and
+    click anywhere on the map.
+
+</div>
+
+<div id="specialtySection">
+
+    <label for="specialtySelect">
+        🩺 Medical Specialty
+    </label>
+
+    <select id="specialty">
+
+        <option value="">
+            General / Any Specialty
+        </option>
+
+        <option value="cardiology">
+            Cardiology
+        </option>
+
+        <option value="orthopaedic">
+            Orthopaedic
+        </option>
+
+        <option value="neurology">
+            Neurology
+        </option>
+
+        <option value="dental">
+            Dental
+        </option>
+
+        <option value="oncology">
+            Oncology
+        </option>
+
+        <option value="paediatrics">
+            Paediatrics
+        </option>
+
+        <option value="gynaecology">
+            Gynaecology
+        </option>
+
+        <option value="dermatology">
+            Dermatology
+        </option>
+
+        <option value="ophthalmology">
+            Ophthalmology
+        </option>
+
+        <option value="general medicine">
+            General Medicine
+        </option>
+
+    </select>
+
+</div>
+
+
+        <div id="status"></div>
+
+
+        <div id="hospitalList"></div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================
+     LEAFLET JS
+========================================= -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+<!-- Leaflet MarkerCluster -->
+<script
+    src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js">
+</script>
+
+<!-- Healthcare GIS application logic -->
+<script src="/static/js/app.js"></script>
+
+
+
+
+</body>
+
+</html>
